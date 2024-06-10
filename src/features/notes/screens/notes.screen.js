@@ -136,7 +136,7 @@ export const NotesScreen = ({ navigation }) => {
           bottom: 0,
           borderRadius: 1000,
 
-          backgroundColor: "tomato",
+          backgroundColor: "#3b9efe",
         }}
       />
       <SearchContainer>

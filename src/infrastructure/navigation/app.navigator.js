@@ -10,7 +10,7 @@ const TAB_ICONS = {
   Settings: [Ionicons, "settings"],
 };
 const TAB_ICONS_COLORS = {
-  Active: "tomato",
+  Active: "#3b9efe",
   Inactive: "#A5A5A5",
 };
 
@@ -27,7 +27,7 @@ const createScreenOptions = ({ route }) => {
     tabBarActiveTintColor: TAB_ICONS_COLORS["Active"],
     tabBarInactiveTintColor: TAB_ICONS_COLORS["Inactive"],
     tabBarStyle: {
-      backgroundColor: "black",
+      backgroundColor: "#f4f4f4",
       borderTopWidth: 0,
     },
   };

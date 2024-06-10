@@ -32,6 +32,8 @@ const Loading = styled.ActivityIndicator`
 `;
 
 export const EditNoteScreen = ({ route, navigation }) => {
+  placeholder="Search notes"
+  
   const isFocused = useIsFocused();
   const theme = useTheme();
   const { noteId } = route.params;
