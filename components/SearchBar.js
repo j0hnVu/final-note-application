@@ -5,14 +5,12 @@ import { View, TextInput, StyleSheet } from 'react-native';
 const SearchBar = ({ isVisible, searchQuery, setSearchQuery, toggleSearch }) => {
   return (
     <View style={styles.searchContainer}>
-      {isVisible && (
         <TextInput
           style={styles.searchInput}
           placeholder="Search"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-      )}
     </View>
   );
 };
@@ -22,7 +20,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-    backgroundColor: '#f0f0f0',
     paddingHorizontal: 10,
     borderRadius: 10,
   },
