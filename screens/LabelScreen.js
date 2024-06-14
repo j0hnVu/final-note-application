@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#efefef',
     alignItems: 'center',
   },
   labelText: {

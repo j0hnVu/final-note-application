@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   label: {
-    backgroundColor: '#ddd',
+    backgroundColor: '#efefef',
     borderRadius: 12,
     padding: 4,
     margin: 2,

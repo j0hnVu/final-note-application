@@ -83,12 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
-  noteCount: {
-    color: '#007BFF',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
   noNotesText: {
     fontSize: 18,
     textAlign: 'center',
