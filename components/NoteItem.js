@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   noteTime: {
     fontSize: 12,
-    color: '#555',
+    color: '#888',
   },
   labelContainer: {
     flexDirection: 'row',
@@ -62,11 +62,12 @@ const styles = StyleSheet.create({
     padding: 4,
     marginTop: 8,
     marginBottom: 6,
+    marginRight: 4,
     fontSize: 12,
   },
   bookmarkIcon: {
     position: 'absolute',
-    top: 42,
+    top: 50,
     right: 16,
   },
 });

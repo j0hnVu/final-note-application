@@ -1,68 +1,63 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useMemo, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import NoteItem from '../components/NoteItem';
 import { NotesContext } from '../context/NotesContext';
 import { LabelsContext } from '../context/LabelsContext';
+import NoteItem from '../components/NoteItem';
 import SearchBar from '../components/SearchBar';
 
-const HomeScreen = () => {
+const Home = () => {
   const { notes } = useContext(NotesContext);
   const { labels } = useContext(LabelsContext);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [filteredNotes, setFilteredNotes] = useState([]);
-  const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const nav = useNavigation();
   const isFocused = useIsFocused();
+
+  const filteredNotes = useMemo(() => {
+    return notes.filter(
+      (note) => !note.isDeleted && note.content.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [notes, searchQuery]);
 
   useEffect(() => {
     if (isFocused) {
-      setFilteredNotes(notes.filter(note => !note.isDeleted));
+      setSearchQuery('');
     }
-  }, [notes, isFocused]);
+  }, [isFocused]);
 
-  useEffect(() => {
-    const filtered = notes.filter(
-      note => note.content.toLowerCase().includes(searchQuery.toLowerCase()) && !note.isDeleted
-    );
-    setFilteredNotes(filtered);
-  }, [searchQuery, notes]);
+  const handleNotePress = useCallback((noteId) => {
+    nav.navigate('EditNote', { noteId });
+  }, [nav]);
 
-  const handleNotePress = (noteId) => {
-    navigation.navigate('EditNote', { noteId });
-  };
+  const renderNoteItem = useCallback(
+    ({ item }) => <NoteItem item={item} labels={labels} onPress={handleNotePress} />,
+    [labels, handleNotePress]
+  );
 
-  const toggleSearch = () => {
-    setIsSearchVisible(!isSearchVisible);
-  };
+  const keyExtractor = useCallback((item) => item.id, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <SearchBar
-          isVisible="true"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          toggleSearch={toggleSearch}
-        />
+        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </View>
 
       {filteredNotes.length === 0 ? (
-        <Text style={styles.noNotesText}>{searchQuery ? 'Not found!' : 'No Notes \n Tap + icon to create new note'}</Text>
+        <Text style={styles.noNotesText}>
+          {searchQuery ? 'No matching notes found!' : 'No notes yet, tap the + button to create one.'}
+        </Text>
       ) : (
         <FlatList
           data={filteredNotes}
-          renderItem={({ item }) => <NoteItem item={item} labels={labels} onPress={handleNotePress} />}
-          keyExtractor={(item) => item.id}
+          renderItem={renderNoteItem}
+          keyExtractor={keyExtractor}
           style={styles.notesList}
         />
       )}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate('NewNote')}
-      >
-        <Ionicons name="add" size={24} color="white" />
+
+      <TouchableOpacity style={styles.addButton} onPress={() => nav.navigate('NewNote')}>
+        <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
     </View>
   );
@@ -72,36 +67,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  title: {
-    paddingBottom:20,
-    fontSize: 24,
-    fontWeight: 'bold',
+    marginBottom: 16,
   },
   noNotesText: {
     fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
+    color: '#888',
   },
   notesList: {
-    marginTop: 10,
+    flex: 1,
   },
   addButton: {
     position: 'absolute',
-    right: 16,
-    bottom: 16,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#007BFF',
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#ff0000',
     alignItems: 'center',
     justifyContent: 'center',
   },
 });
 
-export default HomeScreen;
+export default Home;
