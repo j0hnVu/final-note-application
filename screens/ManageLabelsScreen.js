@@ -50,7 +50,7 @@ const ManageLabelsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.labelCount}>{`${totalLabels} total, ${selectedLabelsCount} selected`}</Text>
+      <Text style={styles.labelCount}>{`Total: ${totalLabels}, Selected:${selectedLabelsCount}`}</Text>
       <FlatList
         data={labels}
         renderItem={renderLabelItem}
@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   labelCount: {
-    color: '#007BFF',
-    fontSize: 16,
-    textAlign: 'center',
+    color: "black",
+    fontSize: 15,
+    textAlign: 'left',
     marginBottom: 16,
   },
   labelItem: {
@@ -84,8 +84,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  labelsList: {
+    marginTop: 20,
+    marginRight: 100,
+  },
   selectedLabel: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#ff0000',
   },
   unselectedLabel: {
     backgroundColor: '#f0f0f0',
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     padding: 16,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#ff0000',
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 16,

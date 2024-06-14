@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text,TextInput, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LabelsContext } from '../context/LabelsContext';
 import { NotesContext } from '../context/NotesContext';
@@ -56,13 +56,21 @@ const LabelScreen = () => {
       return;
     }
 
-    const updatedLabels = labels.map(label => 
+    const updatedLabels = labels.map(label =>
       label.id === selectedLabel.id ? { ...label, label: editLabelText.trim() } : label
     );
 
     setLabels(updatedLabels);
     setIsEditModalVisible(false);
   };
+
+  const handleCancel = () => {
+    setNewLabel('');
+    setEditLabelText('');
+    setIsCreateModalVisible(false);
+    setIsEditModalVisible(false);
+  };
+
 
   const handleDeleteLabel = () => {
     const updatedLabels = labels.filter(label => label.id !== selectedLabel.id);
@@ -102,14 +110,12 @@ const LabelScreen = () => {
       </View>
 
       {filteredLabels.length > 0 ? (
-        <Text style={styles.labelCount}>Total labels: {filteredLabels.length}</Text>
+        <Text style={styles.labelCount}>Total: {filteredLabels.length}</Text>
       ) : (
-        <Text style={styles.noLabelsText}>No labels. {'\n'} 
-        Click the button below to create a new label</Text>
+        <Text style={styles.noLabelsText}>No labels match.</Text>
       )}
 
       <TouchableOpacity
-        style={styles.createButton}
         onPress={() => setIsCreateModalVisible(true)}
       >
         <Text style={styles.createButtonText}>+ Create New Label</Text>
@@ -142,8 +148,11 @@ const LabelScreen = () => {
               onChangeText={setNewLabel}
             />
             <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleAddLabel}>
-                <Text style={styles.modalButtonText}>Create</Text>
+              <TouchableOpacity onPress={handleAddLabel}>
+                <Text style={styles.LeftButtonText}>Create</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleCancel}>
+                <Text style={styles.RightButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -166,11 +175,11 @@ const LabelScreen = () => {
               onChangeText={setEditLabelText}
             />
             <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleEditLabel}>
-                <Text style={styles.modalButtonText}>Save</Text>
+              <TouchableOpacity onPress={handleEditLabel}>
+                <Text style={styles.LeftButtonText}>Save</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, styles.deleteButton]} onPress={handleDeleteLabel}>
-                <Text style={styles.modalButtonText}>Delete</Text>
+              <TouchableOpacity onPress={handleDeleteLabel}>
+                <Text style={styles.RightButtonText}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -189,17 +198,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   title: {
-    paddingBottom:20,
+    paddingBottom: 20,
     fontSize: 24,
     fontWeight: 'bold',
   },
   labelCount: {
-    color: '#007BFF',
-    fontSize: 16,
-    textAlign: 'center',
+    color: "black",
+    fontSize: 13,
+    textAlign: 'left',
     marginBottom: 16,
   },
   noLabelsText: {
@@ -207,9 +216,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 16,
-  },
-  labelsList: {
-    marginTop: 20,
   },
   labelItem: {
     flex: 1,
@@ -227,18 +233,10 @@ const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: 'space-between', // Distribute labels evenly across the row
   },
-  createButton: {
-    padding: 10,
-    backgroundColor: '#007BFF',
-    borderRadius: 8,
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 16,
-    width: '80%',
-  },
   createButtonText: {
-    color: 'white',
+    color: '#ff0000',
     fontSize: 16,
+    marginBottom: 15,
   },
   modalOverlay: {
     flex: 1,
@@ -270,21 +268,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
-  modalButton: {
-    flex: 1,
-    marginHorizontal: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#007BFF',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-  },
-  modalButtonText: {
-    color: 'white',
+  LeftButtonText: {
+    color: '#ff0000',
     fontSize: 16,
+    marginLeft: 20,
+  },
+  RightButtonText: {
+    color: 'gray',
+    fontSize: 16,
+    marginRight: 20
   },
 });
 
