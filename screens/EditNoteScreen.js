@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { COLORS } from '../data/dummy-data';
 import { NotesContext } from '../context/NotesContext';
 import { LabelsContext } from '../context/LabelsContext';
 
@@ -15,6 +16,7 @@ const EditNoteScreen = () => {
   const [note, setNote] = useState(notes.find(n => n.id === noteId));
   const [isBookmarked, setIsBookmarked] = useState(note ? note.isBookmarked : false);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(note ? note.color : null);
   const [selectedLabels, setSelectedLabels] = useState(note ? note.labelIds : []);
 
   useEffect(() => {
@@ -33,23 +35,20 @@ const EditNoteScreen = () => {
       const updatedNote = {
         ...note,
         isBookmarked,
+        color: selectedColor,
         labelIds: selectedLabels,
         updateAt: new Date().toISOString(),
       };
 
-      const noteIndex = notes.findIndex(n => n.id === note.id);
-      if (noteIndex !== -1) {
-        const updatedNotes = [...notes];
-        updatedNotes[noteIndex] = updatedNote;
-        setNotes(updatedNotes);
-      }
+      const updatedNotes = notes.map(n => (n.id === note.id ? updatedNote : n));
+      setNotes(updatedNotes);
 
       navigation.navigate('Home', { updatedNote });
     }
   };
 
   const deleteNoteHandler = () => {
-    const updatedNotes = notes.map(n => n.id === note.id ? { ...n, isDeleted: true } : n);
+    const updatedNotes = notes.map(n => (n.id === note.id ? { ...n, isDeleted: true } : n));
     setNotes(updatedNotes);
     navigation.goBack();
   };
@@ -58,6 +57,32 @@ const EditNoteScreen = () => {
     setBottomSheetVisible(false);
     navigation.navigate('ManageLabels', { noteId, selectedLabels });
   };
+
+  const calculateTimeAgo = (dateTime) => {
+    const now = new Date();
+    const updatedAt = new Date(dateTime);
+    const diffMs = now - updatedAt;
+    const diffSec = Math.round(diffMs / 1000);
+    const diffMin = Math.round(diffSec / 60);
+    const diffHr = Math.round(diffMin / 60);
+    const diffDay = Math.round(diffHr / 24);
+
+    if (diffSec < 60) {
+      return `${diffSec} seconds ago`;
+    } else if (diffMin < 60) {
+      return `${diffMin} minutes ago`;
+    } else if (diffHr < 24) {
+      return `${diffHr} hours ago`;
+    } else {
+      return `${diffDay} days ago`;
+    }
+  };  
+
+  const ActionButton = () => (
+    <TouchableOpacity style={styles.actionButton} onPress={saveNoteHandler}>
+      <Ionicons name="checkmark" size={24} color="white" />
+    </TouchableOpacity>
+  );
 
   if (!note) {
     return (
@@ -74,45 +99,28 @@ const EditNoteScreen = () => {
           <Text key={labelId} style={styles.label}>{getLabelText(labelId)}</Text>
         ))}
       </View>
-      <View style={[styles.inputContainer]}>
+      <View style={[styles.inputContainer, { backgroundColor: '#fff', paddingTop: 12 }]}>
         <TextInput
           style={styles.input}
           value={note.content}
           onChangeText={(text) => setNote({ ...note, content: text })}
           multiline
+          selectionColor="#888"
         />
       </View>
       <View style={styles.bottomTab}>
-        <Text style={styles.noteTime}>{`Edited ${new Date(note.updateAt).toLocaleString()}`}</Text>
-        <TouchableOpacity onPress={() => setIsBookmarked(!isBookmarked)}>
-          <Ionicons name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setBottomSheetVisible(true)}>
-          <Ionicons name="ellipsis-vertical" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      <Modal
-        isVisible={isBottomSheetVisible}
-        onBackdropPress={() => setBottomSheetVisible(false)}
-        style={styles.modal}
-      >
-        <View style={styles.bottomSheet}>
-          <TouchableOpacity style={styles.bottomSheetButton} onPress={manageLabelsHandler}>
-            <Text style={styles.bottomSheetButtonText}>Manage labels</Text>
+        <Text style={styles.noteTime}>{`Edited ${calculateTimeAgo(note.updateAt)}`}</Text>
+        <View style={styles.bottomActions}>
+          <TouchableOpacity style={styles.iconContainer} onPress={() => setIsBookmarked(!isBookmarked)}>
+            <Ionicons name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomSheetButton} onPress={deleteNoteHandler}>
-            <Text style={styles.bottomSheetButtonText}>Delete</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomSheetButton} onPress={() => setBottomSheetVisible(false)}>
-            <Text style={styles.bottomSheetButtonText}>Cancel</Text>
+          <TouchableOpacity style={styles.iconContainer} onPress={() => setBottomSheetVisible(true)}>
+            <Ionicons name="ellipsis-vertical" size={24} color="black" />
           </TouchableOpacity>
         </View>
-      </Modal>
+      </View>
 
-      <TouchableOpacity style={styles.actionButton} onPress={saveNoteHandler}>
-        <Ionicons name="checkmark" size={24} color="white" />
-      </TouchableOpacity>
+      <ActionButton />
     </View>
   );
 };
@@ -120,46 +128,57 @@ const EditNoteScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#fff',
   },
   labelContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   label: {
-    backgroundColor: '#efefef',
-    borderRadius: 12,
+    backgroundColor: '#e0e0e0',
     padding: 4,
     margin: 2,
     fontSize: 12,
+    color: '#888'
   },
   inputContainer: {
     flex: 1,
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 16,
+    paddingHorizontal: 16,
   },
   input: {
     flex: 1,
     fontSize: 16,
+    textAlign: 'left',
+    textAlignVertical: 'top',
   },
   bottomTab: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8f8f8',
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderColor: '#ddd',
   },
   noteTime: {
-    fontSize: 12,
+    fontSize: 20,
     color: '#555',
+  },
+  bottomActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    paddingHorizontal: 12, 
+    paddingVertical: 8,
   },
   actionButton: {
     position: 'absolute',
     right: 16,
-    bottom: 90,
+    bottom: 72, 
     width: 56,
     height: 56,
     borderRadius: 28,
