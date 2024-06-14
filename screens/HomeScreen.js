@@ -8,32 +8,38 @@ import NoteItem from '../components/NoteItem';
 import SearchBar from '../components/SearchBar';
 
 const Home = () => {
-  const { notes } = useContext(NotesContext);
-  const { labels } = useContext(LabelsContext);
+  const {notes} = useContext(NotesContext);
+  const {labels} = useContext(LabelsContext);
   const [searchQuery, setSearchQuery] = React.useState('');
   const nav = useNavigation();
   const isFocused = useIsFocused();
 
   const filteredNotes = useMemo(() => {
-    return notes.filter(
-      (note) => !note.isDeleted && note.content.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return notes.reduce((acc, note) => {
+      if (!note.isDeleted && note.content.toLowerCase().includes(searchQuery.toLowerCase())) {
+        acc.push(note);
+      }
+      return acc;
+    }, []);
   }, [notes, searchQuery]);
-
+  
   useEffect(() => {
     if (isFocused) {
       setSearchQuery('');
     }
   }, [isFocused]);
 
-  const handleNotePress = useCallback((noteId) => {
+  const handlePress = useCallback((noteId) => {
     nav.navigate('EditNote', { noteId });
   }, [nav]);
 
-  const renderNoteItem = useCallback(
-    ({ item }) => <NoteItem item={item} labels={labels} onPress={handleNotePress} />,
-    [labels, handleNotePress]
+  const renderItem = useCallback(
+    function renderNoteItem({ item }) {
+      return <NoteItem item={item} labels={labels} onPress={handlePress} />;
+    },
+    [labels, handlePress]
   );
+  
 
   const keyExtractor = useCallback((item) => item.id, []);
 
@@ -42,20 +48,20 @@ const Home = () => {
       <View style={styles.header}>
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </View>
-
-      {filteredNotes.length === 0 ? (
-        <Text style={styles.noNotesText}>
-          {searchQuery ? 'No matching notes found!' : 'No notes yet, tap the + button to create one.'}
-        </Text>
-      ) : (
+  
+      {filteredNotes.length > 0 ? (
         <FlatList
           data={filteredNotes}
-          renderItem={renderNoteItem}
+          renderItem={renderItem}
           keyExtractor={keyExtractor}
           style={styles.notesList}
         />
+      ) : (
+        <Text style={styles.noNotesText}>
+          {searchQuery ? 'Notea not found!' : 'Press + to create new note.'}
+        </Text>
       )}
-
+  
       <TouchableOpacity style={styles.addButton} onPress={() => nav.navigate('NewNote')}>
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>

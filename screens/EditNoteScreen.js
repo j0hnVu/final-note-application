@@ -3,7 +3,6 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { COLORS } from '../data/dummy-data';
 import { NotesContext } from '../context/NotesContext';
 import { LabelsContext } from '../context/LabelsContext';
 
@@ -16,7 +15,6 @@ const EditNoteScreen = () => {
   const [note, setNote] = useState(notes.find(n => n.id === noteId));
   const [isBookmarked, setIsBookmarked] = useState(note ? note.isBookmarked : false);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(note ? note.color : null);
   const [selectedLabels, setSelectedLabels] = useState(note ? note.labelIds : []);
 
   useEffect(() => {
@@ -35,7 +33,6 @@ const EditNoteScreen = () => {
       const updatedNote = {
         ...note,
         isBookmarked,
-        color: selectedColor,
         labelIds: selectedLabels,
         updateAt: new Date().toISOString(),
       };
@@ -77,7 +74,7 @@ const EditNoteScreen = () => {
           <Text key={labelId} style={styles.label}>{getLabelText(labelId)}</Text>
         ))}
       </View>
-      <View style={[styles.inputContainer, { backgroundColor: selectedColor || '#fff' }]}>
+      <View style={[styles.inputContainer]}>
         <TextInput
           style={styles.input}
           value={note.content}
@@ -101,25 +98,6 @@ const EditNoteScreen = () => {
         style={styles.modal}
       >
         <View style={styles.bottomSheet}>
-          <Text style={styles.bottomSheetTitle}>Select note's color</Text>
-          <View style={styles.colorsContainer}>
-            <TouchableOpacity
-              key="no-color"
-              style={[styles.colorOption, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
-              onPress={() => setSelectedColor(null)}
-            >
-              {selectedColor === null && <Ionicons name="checkmark" size={24} color="black" />}
-            </TouchableOpacity>
-            {COLORS.map(color => (
-              <TouchableOpacity
-                key={color}
-                style={[styles.colorOption, { backgroundColor: color }]}
-                onPress={() => setSelectedColor(color)}
-              >
-                {selectedColor === color && <Ionicons name="checkmark" size={24} color="black" />}
-              </TouchableOpacity>
-            ))}
-          </View>
           <TouchableOpacity style={styles.bottomSheetButton} onPress={manageLabelsHandler}>
             <Text style={styles.bottomSheetButtonText}>Manage labels</Text>
           </TouchableOpacity>

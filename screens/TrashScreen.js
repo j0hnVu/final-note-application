@@ -50,13 +50,13 @@ const TrashScreen = () => {
     setIsEmptyTrashModalVisible(false);
   };
 
-  const handleNotePress = (noteId) => {
+  const handlePress = (noteId) => {
     setSelectedNote(noteId);
     setIsNoteModalVisible(true);
   };
 
-  const renderNoteItem = ({ item }) => (
-    <NoteItem item={item} labels={labels} onPress={handleNotePress} />
+  const renderItem = ({ item }) => (
+    <NoteItem item={item} labels={labels} onPress={handlePress} />
   );
 
   return (
@@ -70,7 +70,7 @@ const TrashScreen = () => {
       ) : (
         <FlatList
           data={trashNotes}
-          renderItem={renderNoteItem}
+          renderItem={renderItem}
           keyExtractor={(item) => item.id}
           style={styles.notesList}
         />
