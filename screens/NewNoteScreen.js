@@ -40,6 +40,14 @@ const NewNoteScreen = () => {
     navigation.navigate('Home');
   };
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: 'Note',
+      headerTitleAlign: 'center',
+      headerTintColor: 'black',
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -64,9 +72,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
     marginBottom: 16,
+    textAlign: 'left',
+    textAlignVertical: 'top',
   },
   actionButton: {
     position: 'absolute',
