@@ -28,22 +28,30 @@ const ManageLabelsScreen = () => {
     navigation.navigate('EditNote', { noteId, updatedLabels: labelsState });
   };
 
-  const renderLabelItem = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.labelItem,
-        labelsState.includes(item.id) ? styles.selectedLabel : styles.unselectedLabel,
-      ]}
-      onPress={() => toggleLabel(item.id)}
-    >
-      <Text style={[
-        styles.labelText,
-        labelsState.includes(item.id) ? styles.selectedLabelText : styles.unselectedLabelText,
-      ]}>
-        {item.label}
-      </Text>
-    </TouchableOpacity>
-  );
+  const renderLabelItem = ({ item }) => {
+    if (item.id === 'placeholder') {
+      return <View style={styles.labelItemPlaceholder} />;
+    }
+  
+    return (
+      <TouchableOpacity
+        style={[
+          styles.labelItem,
+          labelsState.includes(item.id) ? styles.selectedLabel : styles.unselectedLabel,
+        ]}
+        onPress={() => toggleLabel(item.id)}
+      >
+        <Text
+          style={[
+            styles.labelText,
+            labelsState.includes(item.id) ? styles.selectedLabelText : styles.unselectedLabelText,
+          ]}
+        >
+          {item.label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const totalLabels = labels.length;
   const selectedLabelsCount = labelsState.length;
@@ -52,11 +60,14 @@ const ManageLabelsScreen = () => {
     <View style={styles.container}>
       <Text style={styles.labelCount}>{`Total: ${totalLabels}, Selected:${selectedLabelsCount}`}</Text>
       <FlatList
-        data={labels}
+        data={[
+          ...labels,
+          ...(labels.length % 2 === 1 ? [{ id: 'placeholder' }] : []),
+        ]}
         renderItem={renderLabelItem}
         keyExtractor={(item) => item.id}
-        numColumns={2} // Display labels in two columns
-        columnWrapperStyle={styles.columnWrapper} // Style for the row
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
       />
       <TouchableOpacity style={styles.saveButton} onPress={saveLabelsHandler}>
         <Text style={styles.saveButtonText}>Save</Text>
@@ -83,6 +94,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  labelItemPlaceholder: {
+    flex: 1,
+    padding: 12,
+    margin: 4,
+    backgroundColor: 'transparent',
   },
   labelsList: {
     marginTop: 20,
