@@ -3,7 +3,6 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { COLORS } from '../data/dummy-data';
 import { NotesContext } from '../context/NotesContext';
 import { LabelsContext } from '../context/LabelsContext';
 
@@ -13,10 +12,9 @@ const EditNoteScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { noteId } = route.params;
-  const [note, setNote] = useState(notes.find(n => n.id === noteId));
+  const [note, setNote] = useState(notes ? notes.find(n => n.id === noteId) : null);
   const [isBookmarked, setIsBookmarked] = useState(note ? note.isBookmarked : false);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(note ? note.color : null);
   const [selectedLabels, setSelectedLabels] = useState(note ? note.labelIds : []);
 
   useEffect(() => {
@@ -35,7 +33,6 @@ const EditNoteScreen = () => {
       const updatedNote = {
         ...note,
         isBookmarked,
-        color: selectedColor,
         labelIds: selectedLabels,
         updateAt: new Date().toISOString(),
       };
@@ -48,9 +45,11 @@ const EditNoteScreen = () => {
   };
 
   const deleteNoteHandler = () => {
-    const updatedNotes = notes.map(n => (n.id === note.id ? { ...n, isDeleted: true } : n));
-    setNotes(updatedNotes);
-    navigation.goBack();
+    if (note && notes) {
+      const updatedNotes = notes.map(n => (n.id === note.id ? { ...n, isDeleted: true } : n));
+      setNotes(updatedNotes);
+      navigation.goBack();
+    }
   };
 
   const manageLabelsHandler = () => {
@@ -76,7 +75,7 @@ const EditNoteScreen = () => {
     } else {
       return `${diffDay} days ago`;
     }
-  };  
+  };
 
   const ActionButton = () => (
     <TouchableOpacity style={styles.actionButton} onPress={saveNoteHandler}>
@@ -99,7 +98,7 @@ const EditNoteScreen = () => {
           <Text key={labelId} style={styles.label}>{getLabelText(labelId)}</Text>
         ))}
       </View>
-      <View style={[styles.inputContainer, { backgroundColor: '#fff', paddingTop: 12 }]}>
+      <View style={[styles.inputContainer, { backgroundColor: note.color || '#fff', paddingTop: 12 }]}>
         <TextInput
           style={styles.input}
           value={note.content}
@@ -119,6 +118,24 @@ const EditNoteScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        isVisible={isBottomSheetVisible}
+        onBackdropPress={() => setBottomSheetVisible(false)}
+        style={styles.modal}
+      >
+        <View style={styles.bottomSheet}>
+          <TouchableOpacity style={styles.bottomSheetButton} onPress={manageLabelsHandler}>
+            <Text style={styles.bottomSheetButtonText}>Manage labels</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomSheetButton} onPress={deleteNoteHandler}>
+            <Text style={styles.bottomSheetButtonText}>Delete</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomSheetButton} onPress={() => setBottomSheetVisible(false)}>
+            <Text style={styles.bottomSheetButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       <ActionButton />
     </View>
@@ -182,7 +199,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#ff0000',
     alignItems: 'center',
     justifyContent: 'center',
   },
