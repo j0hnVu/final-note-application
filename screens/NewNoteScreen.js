@@ -1,8 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { NotesContext } from '../context/NotesContext';
+import React, { useState, useContext } from "react";
+import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NotesContext } from "../context/notesContext";
 
 const generateUniqueId = (() => {
   let counter = 0;
@@ -16,8 +16,8 @@ const generateUniqueId = (() => {
 })();
 
 const NewNoteScreen = () => {
-  const [content, setContent] = useState('');
-  const navigation = useNavigation();
+  const [content, setContent] = useState("");
+  const nav = useNavigation();
   const { notes, setNotes } = useContext(NotesContext);
 
   const saveNoteHandler = () => {
@@ -37,16 +37,16 @@ const NewNoteScreen = () => {
     };
 
     setNotes([...notes, newNote]);
-    navigation.navigate('Home');
+    nav.navigate("Home");
   };
 
   React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: 'Note',
-      headerTitleAlign: 'center',
-      headerTintColor: 'black',
+    nav.setOptions({
+      headerTitle: "Note",
+      headerTitleAlign: "center",
+      headerTintColor: "black",
     });
-  }, [navigation]);
+  }, [nav]);
 
   return (
     <View style={styles.container}>
@@ -73,19 +73,19 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     marginBottom: 16,
-    textAlign: 'left',
-    textAlignVertical: 'top',
+    textAlign: "left",
+    textAlignVertical: "top",
   },
   actionButton: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
     bottom: 16,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#ff0000',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#ff0000",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

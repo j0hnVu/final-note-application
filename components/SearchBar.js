@@ -1,24 +1,23 @@
-// components/SearchBar.js
-import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import React from "react";
+import { View, TextInput, StyleSheet } from "react-native";
 
-const SearchBar = ({ isVisible, searchQuery, setSearchQuery, toggleSearch }) => {
+const SearchBar = ({ searchQuery, setSearchQuery }) => {
   return (
     <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
@@ -27,10 +26,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
 });
 

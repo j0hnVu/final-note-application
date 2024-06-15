@@ -1,21 +1,29 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LabelsContext } from '../context/LabelsContext';
-import { NotesContext } from '../context/NotesContext';
-import SearchBar from '../components/SearchBar';
+import React, { useState, useContext, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LabelsContext } from "../context/labelsContext";
+import { NotesContext } from "../context/notesContext";
+import SearchBar from "../components/searchBar";
 
 const LabelScreen = () => {
   const { labels, setLabels } = useContext(LabelsContext);
   const { notes, setNotes } = useContext(NotesContext);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [filteredLabels, setFilteredLabels] = useState(labels);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [newLabel, setNewLabel] = useState('');
+  const [newLabel, setNewLabel] = useState("");
   const [selectedLabel, setSelectedLabel] = useState(null);
-  const [editLabelText, setEditLabelText] = useState('');
+  const [editLabelText, setEditLabelText] = useState("");
 
   useEffect(() => {
     setFilteredLabels(labels);
@@ -24,40 +32,52 @@ const LabelScreen = () => {
   const handleSearch = (text) => {
     setSearchQuery(text);
     if (text) {
-      setFilteredLabels(labels.filter(label => label.label.toLowerCase().includes(text.toLowerCase())));
+      setFilteredLabels(
+        labels.filter((label) =>
+          label.label.toLowerCase().includes(text.toLowerCase())
+        )
+      );
     } else {
       setFilteredLabels(labels);
     }
   };
 
   const handleAddLabel = () => {
-    if (newLabel.trim() === '') return;
+    if (newLabel.trim() === "") return;
 
-    const labelExists = labels.some(label => label.label.toLowerCase() === newLabel.trim().toLowerCase());
+    const labelExists = labels.some(
+      (label) => label.label.toLowerCase() === newLabel.trim().toLowerCase()
+    );
 
     if (labelExists) {
-      alert("This label already exists.");
+      alert("Duplicated labels.");
       return;
     }
 
     const newLabelObj = { id: `l${labels.length + 1}`, label: newLabel.trim() };
     setLabels([...labels, newLabelObj]);
-    setNewLabel('');
+    setNewLabel("");
     setIsCreateModalVisible(false);
   };
 
   const handleEditLabel = () => {
-    if (editLabelText.trim() === '') return;
+    if (editLabelText.trim() === "") return;
 
-    const labelExists = labels.some(label => label.label.toLowerCase() === editLabelText.trim().toLowerCase() && label.id !== selectedLabel.id);
+    const labelExists = labels.some(
+      (label) =>
+        label.label.toLowerCase() === editLabelText.trim().toLowerCase() &&
+        label.id !== selectedLabel.id
+    );
 
     if (labelExists) {
-      alert("This label already exists.");
+      alert("Duplicated labels.");
       return;
     }
 
-    const updatedLabels = labels.map(label =>
-      label.id === selectedLabel.id ? { ...label, label: editLabelText.trim() } : label
+    const updatedLabels = labels.map((label) =>
+      label.id === selectedLabel.id
+        ? { ...label, label: editLabelText.trim() }
+        : label
     );
 
     setLabels(updatedLabels);
@@ -65,27 +85,32 @@ const LabelScreen = () => {
   };
 
   const handleCancel = () => {
-    setNewLabel('');
-    setEditLabelText('');
+    setNewLabel("");
+    setEditLabelText("");
     setIsCreateModalVisible(false);
     setIsEditModalVisible(false);
   };
 
-
   const handleDeleteLabel = () => {
-    const updatedLabels = labels.filter(label => label.id !== selectedLabel.id);
+    const updatedLabels = labels.filter(
+      (label) => label.id !== selectedLabel.id
+    );
     setLabels(updatedLabels);
 
-    setNotes((prevNotes) => prevNotes.map(note => ({
-      ...note,
-      labelIds: note.labelIds.filter(labelId => labelId !== selectedLabel.id)
-    })));
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => ({
+        ...note,
+        labelIds: note.labelIds.filter(
+          (labelId) => labelId !== selectedLabel.id
+        ),
+      }))
+    );
 
     setIsEditModalVisible(false);
   };
 
   const renderLabelItem = ({ item }) => {
-    if (item.id === 'placeholder') {
+    if (item.id === "placeholder") {
       return <View style={styles.labelItemPlaceholder} />;
     }
 
@@ -111,7 +136,7 @@ const LabelScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <SearchBar
-          isVisible='True'
+          isVisible="True"
           searchQuery={searchQuery}
           setSearchQuery={handleSearch}
           toggleSearch={toggleSearch}
@@ -121,26 +146,24 @@ const LabelScreen = () => {
       {filteredLabels.length > 0 ? (
         <Text style={styles.labelCount}>Total: {filteredLabels.length}</Text>
       ) : (
-        <Text style={styles.noLabelsText}>No labels match.</Text>
+        <Text style={styles.noLabelsText}>No labels found.</Text>
       )}
 
-      <TouchableOpacity
-        onPress={() => setIsCreateModalVisible(true)}
-      >
+      <TouchableOpacity onPress={() => setIsCreateModalVisible(true)}>
         <Text style={styles.createButtonText}>+ Create New Label</Text>
       </TouchableOpacity>
 
       {filteredLabels.length > 0 && (
         <FlatList
-        data={[
-          ...filteredLabels,
-          ...(filteredLabels.length % 2 === 1 ? [{ id: 'placeholder' }] : []),
-        ]}
-        renderItem={renderLabelItem}
-        keyExtractor={(item) => item.id}
-        style={styles.labelsList}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
+          data={[
+            ...filteredLabels,
+            ...(filteredLabels.length % 2 === 1 ? [{ id: "placeholder" }] : []),
+          ]}
+          renderItem={renderLabelItem}
+          keyExtractor={(item) => item.id}
+          style={styles.labelsList}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
         />
       )}
 
@@ -207,94 +230,94 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   title: {
     paddingBottom: 20,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   labelCount: {
     color: "black",
     fontSize: 13,
-    textAlign: 'left',
+    textAlign: "left",
     marginBottom: 16,
   },
   noLabelsText: {
-    color: 'black',
+    color: "black",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 16,
   },
   labelItem: {
     flex: 1,
     padding: 12,
     margin: 4,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#efefef',
-    alignItems: 'center',
+    borderColor: "#efefef",
+    alignItems: "center",
   },
   labelItemPlaceholder: {
     flex: 1,
     padding: 12,
     margin: 4,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   labelText: {
     fontSize: 16,
   },
   columnWrapper: {
-    justifyContent: 'space-between', // Distribute labels evenly across the row
+    justifyContent: "space-between",
   },
   createButtonText: {
-    color: '#ff0000',
+    color: "#ff0000",
     fontSize: 16,
     marginBottom: 15,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
+    width: "80%",
+    backgroundColor: "white",
     borderRadius: 8,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
   },
   modalInput: {
-    width: '100%',
+    width: "100%",
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
     marginBottom: 16,
     padding: 8,
   },
   modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
   LeftButtonText: {
-    color: '#ff0000',
+    color: "#ff0000",
     fontSize: 16,
     marginLeft: 20,
   },
   RightButtonText: {
-    color: 'gray',
+    color: "gray",
     fontSize: 16,
-    marginRight: 20
+    marginRight: 20,
   },
 });
 

@@ -1,68 +1,71 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import NoteItem from '../components/NoteItem';
-import { NotesContext } from '../context/NotesContext';
-import { LabelsContext } from '../context/LabelsContext';
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  Modal,
+  StyleSheet,
+} from "react-native";
+import NoteItem from "../components/noteItem";
+import { NotesContext } from "../context/notesContext";
+import { LabelsContext } from "../context/labelsContext";
 
 const TrashScreen = () => {
   const { notes, setNotes } = useContext(NotesContext);
   const { labels } = useContext(LabelsContext);
   const [selectedNote, setSelectedNote] = useState(null);
-  const [isNoteModalVisible, setIsNoteModalVisible] = useState(false);
-  const [isRestoreAllModalVisible, setIsRestoreAllModalVisible] = useState(false);
-  const [isEmptyTrashModalVisible, setIsEmptyTrashModalVisible] = useState(false);
+  const [modals, setModals] = useState({
+    noteModal: false,
+    restoreAllModal: false,
+    emptyTrashModal: false,
+  });
 
-  const trashNotes = notes.filter(note => note.isDeleted);
+  const trashNotes = notes.filter((note) => note.isDeleted);
 
-  const restoreNote = (noteId) => {
-    setNotes(prevNotes =>
-      prevNotes.map(note =>
+  const handleNotePress = (noteId) => {
+    setSelectedNote(noteId);
+    setModals((prevModals) => ({ ...prevModals, noteModal: true }));
+  };
+
+  const handleRestoreNote = (noteId) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
         note.id === noteId ? { ...note, isDeleted: false } : note
       )
     );
-    setIsNoteModalVisible(false);
+    setModals((prevModals) => ({ ...prevModals, noteModal: false }));
   };
 
-  const deleteNotePermanently = (noteId) => {
-    setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
-    setIsNoteModalVisible(false);
+  const handleDeleteNotePermanently = (noteId) => {
+    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+    setModals((prevModals) => ({ ...prevModals, noteModal: false }));
   };
 
-  const confirmRestoreAllNotes = () => {
-    setIsRestoreAllModalVisible(true);
-  };
-
-  const confirmEmptyTrash = () => {
-    setIsEmptyTrashModalVisible(true);
-  };
-
-  const restoreAllNotes = () => {
-    setNotes(prevNotes =>
-      prevNotes.map(note =>
+  const handleRestoreAllNotes = () => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
         note.isDeleted ? { ...note, isDeleted: false } : note
       )
     );
-    setIsRestoreAllModalVisible(false);
+    setModals((prevModals) => ({ ...prevModals, restoreAllModal: false }));
   };
 
-  const emptyTrash = () => {
-    setNotes(prevNotes => prevNotes.filter(note => !note.isDeleted));
-    setIsEmptyTrashModalVisible(false);
-  };
-
-  const handlePress = (noteId) => {
-    setSelectedNote(noteId);
-    setIsNoteModalVisible(true);
+  const handleEmptyTrash = () => {
+    setNotes((prevNotes) => prevNotes.filter((note) => !note.isDeleted));
+    setModals((prevModals) => ({ ...prevModals, emptyTrashModal: false }));
   };
 
   const renderItem = ({ item }) => (
-    <NoteItem item={item} labels={labels} onPress={handlePress} />
+    <NoteItem item={item} labels={labels} onPress={handleNotePress} />
   );
 
   return (
     <View style={styles.container}>
       {trashNotes.length > 0 && (
-        <Text style={styles.noteCount}>{`${trashNotes.length} notes in trash`}</Text>
+        <Text
+          style={styles.noteCount}
+        >{`${trashNotes.length} notes in trash`}</Text>
       )}
 
       {trashNotes.length === 0 ? (
@@ -75,75 +78,120 @@ const TrashScreen = () => {
           style={styles.notesList}
         />
       )}
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.actionButton, trashNotes.length === 0 && styles.disabledButton]}
-          onPress={confirmRestoreAllNotes}
+          style={[
+            styles.button,
+            trashNotes.length === 0 && styles.disabledButton,
+          ]}
+          onPress={() =>
+            setModals((prevModals) => ({
+              ...prevModals,
+              restoreAllModal: true,
+            }))
+          }
           disabled={trashNotes.length === 0}
         >
-          <Text style={styles.actionButtonText}>Restore All</Text>
+          <Text style={styles.buttonText}>Restore All</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.actionButton, trashNotes.length === 0 && styles.disabledButton, styles.deleteButton]}
-          onPress={confirmEmptyTrash}
+          style={[
+            styles.button,
+            styles.deleteButton,
+            trashNotes.length === 0 && styles.disabledButton,
+          ]}
+          onPress={() =>
+            setModals((prevModals) => ({
+              ...prevModals,
+              emptyTrashModal: true,
+            }))
+          }
           disabled={trashNotes.length === 0}
         >
-          <Text style={styles.actionButtonText}>Empty Trash</Text>
+          <Text style={styles.buttonText}>Empty Trash</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Note Options Modal */}
       <Modal
-        visible={isNoteModalVisible}
-        transparent={true}
+        visible={modals.noteModal}
+        transparent
         animationType="slide"
-        onRequestClose={() => setIsNoteModalVisible(false)}
+        onRequestClose={() =>
+          setModals((prevModals) => ({ ...prevModals, noteModal: false }))
+        }
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <TouchableOpacity onPress={() => restoreNote(selectedNote)}>
-              <Text style={styles.restoreText}>Restore</Text>
+            <TouchableOpacity onPress={() => handleRestoreNote(selectedNote)}>
+              <Text style={styles.modalButtonText}>Restore</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => deleteNotePermanently(selectedNote)}>
-              <Text style={styles.deleteText}>Delete permanently</Text>
+            <TouchableOpacity
+              onPress={() => handleDeleteNotePermanently(selectedNote)}
+            >
+              <Text style={[styles.modalButtonText, styles.deleteText]}>
+                Delete permanently
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* Restore All Confirmation Modal */}
       <Modal
-        visible={isRestoreAllModalVisible}
-        transparent={true}
+        visible={modals.restoreAllModal}
+        transparent
         animationType="slide"
-        onRequestClose={() => setIsRestoreAllModalVisible(false)}
+        onRequestClose={() =>
+          setModals((prevModals) => ({ ...prevModals, restoreAllModal: false }))
+        }
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <TouchableOpacity onPress={restoreAllNotes}>
-              <Text style={styles.restoreText}>Restore All</Text>
+            <TouchableOpacity onPress={handleRestoreAllNotes}>
+              <Text style={styles.modalButtonText}>Restore All</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setIsRestoreAllModalVisible(false)}>
-              <Text style={styles.deleteText}>Cancel</Text>
+            <TouchableOpacity
+              onPress={() =>
+                setModals((prevModals) => ({
+                  ...prevModals,
+                  restoreAllModal: false,
+                }))
+              }
+            >
+              <Text style={[styles.modalButtonText, styles.cancelText]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* Empty Trash Confirmation Modal */}
       <Modal
-        visible={isEmptyTrashModalVisible}
-        transparent={true}
+        visible={modals.emptyTrashModal}
+        transparent
         animationType="slide"
-        onRequestClose={() => setIsEmptyTrashModalVisible(false)}
+        onRequestClose={() =>
+          setModals((prevModals) => ({ ...prevModals, emptyTrashModal: false }))
+        }
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <TouchableOpacity onPress={emptyTrash}>
-              <Text style={styles.deleteText}>Empty Trash</Text>
+            <TouchableOpacity onPress={handleEmptyTrash}>
+              <Text style={[styles.modalButtonText, styles.deleteText]}>
+                Empty Trash
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setIsEmptyTrashModalVisible(false)}>
-              <Text style={styles.restoreText}>Cancel</Text>
+            <TouchableOpacity
+              onPress={() =>
+                setModals((prevModals) => ({
+                  ...prevModals,
+                  emptyTrashModal: false,
+                }))
+              }
+            >
+              <Text style={[styles.modalButtonText, styles.cancelText]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -158,64 +206,64 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   noteCount: {
-    color: '#007BFF',
+    color: "#007BFF",
     fontSize: 16,
-    textAlign: 'left',
     marginBottom: 16,
   },
   noNotesText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
   },
   notesList: {
     marginTop: 20,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 16,
   },
-  actionButton: {
+  button: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#007BFF',
+    backgroundColor: "#007BFF",
     borderRadius: 8,
-    alignItems: 'center',
     marginHorizontal: 8,
   },
   deleteButton: {
-    backgroundColor: 'red',
+    backgroundColor: "#dc3545",
   },
-  actionButtonText: {
+  buttonText: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   disabledButton: {
-    backgroundColor: '#cccccc',
+    backgroundColor: "#ccc",
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
-    width: '80%',
+    width: "80%",
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  restoreText: {
+  modalButtonText: {
     fontSize: 18,
-    color: 'blue',
     marginBottom: 16,
   },
   deleteText: {
-    fontSize: 18,
-    color: 'red',
-    marginBottom: 16,
+    color: "#dc3545",
+  },
+  cancelText: {
+    color: "#007BFF",
   },
 });
 
