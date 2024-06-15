@@ -84,15 +84,24 @@ const LabelScreen = () => {
     setIsEditModalVisible(false);
   };
 
-  const renderLabelItem = ({ item }) => (
-    <TouchableOpacity style={styles.labelItem} onPress={() => {
-      setSelectedLabel(item);
-      setEditLabelText(item.label);
-      setIsEditModalVisible(true);
-    }}>
-      <Text style={styles.labelText}>{item.label}</Text>
-    </TouchableOpacity>
-  );
+  const renderLabelItem = ({ item }) => {
+    if (item.id === 'placeholder') {
+      return <View style={styles.labelItemPlaceholder} />;
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.labelItem}
+        onPress={() => {
+          setSelectedLabel(item);
+          setEditLabelText(item.label);
+          setIsEditModalVisible(true);
+        }}
+      >
+        <Text style={styles.labelText}>{item.label}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const toggleSearch = () => {
     setIsSearchVisible(!isSearchVisible);
@@ -123,12 +132,15 @@ const LabelScreen = () => {
 
       {filteredLabels.length > 0 && (
         <FlatList
-          data={filteredLabels}
-          renderItem={renderLabelItem}
-          keyExtractor={(item) => item.id}
-          style={styles.labelsList}
-          numColumns={2} // Display labels in two columns
-          columnWrapperStyle={styles.columnWrapper} // Style for the row
+        data={[
+          ...filteredLabels,
+          ...(filteredLabels.length % 2 === 1 ? [{ id: 'placeholder' }] : []),
+        ]}
+        renderItem={renderLabelItem}
+        keyExtractor={(item) => item.id}
+        style={styles.labelsList}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
         />
       )}
 
@@ -226,6 +238,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#efefef',
     alignItems: 'center',
+  },
+  labelItemPlaceholder: {
+    flex: 1,
+    padding: 12,
+    margin: 4,
+    backgroundColor: 'transparent',
   },
   labelText: {
     fontSize: 16,
