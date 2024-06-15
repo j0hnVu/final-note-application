@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Modal,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { LabelsContext } from "../context/labelsContext";
 import { NotesContext } from "../context/notesContext";
 import SearchBar from "../components/searchBar";

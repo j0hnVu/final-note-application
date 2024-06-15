@@ -3,14 +3,14 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
+import { NotesProvider } from "./context/notesContext";
+import { LabelsProvider } from "./context/labelsContext";
 import Home from "./screens/HomeScreen";
 import LabelScreen from "./screens/LabelScreen";
 import TrashScreen from "./screens/TrashScreen";
 import NewNoteScreen from "./screens/NewNoteScreen";
 import EditNoteScreen from "./screens/EditNoteScreen";
 import ManageLabelsScreen from "./screens/ManageLabelsScreen";
-import { NotesProvider } from "./context/notesContext";
-import { LabelsProvider } from "./context/labelsContext";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
